@@ -175,6 +175,7 @@ pip install -r requirements.txt
 
 - setup.bat|sh
 ```
+  # 흐름
   Terraform init
       ↓
   Terraform apply
@@ -187,6 +188,9 @@ pip install -r requirements.txt
   Docker 이미지 Build
       ↓
   ECR에 latest 이미지 Push
+
+  # 실행
+  .\scripts\setup.bat
 ```
 
 - run-generator.bat|sh
@@ -194,6 +198,9 @@ pip install -r requirements.txt
 ```
   # 전체 옵션
   scripts\run-generator.bat [DOMAIN] [DURATION] [BASE_RPS] [CORRUPTION_RATE] [TASK_COUNT] [REGION] [TIME_SCALE]
+
+  # 샘플
+  scripts\run-generator.bat ecommerce 10 2.0 0.03
   
   # 흐름
   로컬 PC 명령 수행
