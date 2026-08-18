@@ -148,3 +148,9 @@ L requirements.txt  # 필요 패키지
 ```
 pip install -r requirements.txt
 ```
+
+# Scripts
+- setup.bat|sh
+```
+
+```
