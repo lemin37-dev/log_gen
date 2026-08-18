@@ -153,14 +153,8 @@ pip install -r requirements.txt
 - run-local.bat|sh
   - 로컬 PC에서 로그 생성(로컬 테스트)
   ```
-  # 문법
-  scripts\run-local.bat [DOMAIN] [DURATION] [RPS] [CORRUPTION] [OUTPUT] [TIME_SCALE]
-
-  # 샘플 
-  scripts\run-local.bat finance 5 5 0.05 both 1
-
-  # 해석
-  finance 도메인 로그 생성
+  # 흐름
+  도메인 로그 생성
   ↓
   60초 동안 실행
   ↓
@@ -171,6 +165,12 @@ pip install -r requirements.txt
   출력은 stdout, file 모두 구성(both)
   ↓
   시간 배율 조절은 1
+
+  # 실행 옵션
+  scripts\run-local.bat [DOMAIN] [DURATION] [RPS] [CORRUPTION] [OUTPUT] [TIME_SCALE]
+
+  # 샘플 
+  scripts\run-local.bat finance 5 5 0.05 both 1  
   ```
 
 - setup.bat|sh
@@ -196,12 +196,6 @@ pip install -r requirements.txt
 - run-generator.bat|sh
   - AWS fargate에서 진행
 ```
-  # 전체 옵션
-  scripts\run-generator.bat [DOMAIN] [DURATION] [BASE_RPS] [CORRUPTION_RATE] [TASK_COUNT] [REGION] [TIME_SCALE]
-
-  # 샘플
-  scripts\run-generator.bat ecommerce 10 2.0 0.03
-  
   # 흐름
   로컬 PC 명령 수행
   ↓
@@ -216,4 +210,10 @@ pip install -r requirements.txt
   Python 로그 생성기 작동
   ↓
   CloudWatch에 로그 저장
+
+  # 실행 옵션
+  scripts\run-generator.bat [DOMAIN] [DURATION] [BASE_RPS] [CORRUPTION_RATE] [TASK_COUNT] [REGION] [TIME_SCALE]
+
+  # 샘플
+  scripts\run-generator.bat ecommerce 2 5 0.05 1 ap-northeast-2 1
 ```
