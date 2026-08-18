@@ -20,11 +20,11 @@ variable "public_subnet_cidrs" {
   description = "Public Subnet CIDR 목록, Fargage Task 작동 시 매번 다른 가용영역 사용"
   type        = list(string)
   # AZ 가용영역을 2개 사용하는 것을 염두
-  default     = ["10.20.1.0/24", "10.20.2.0/24"]
-  
+  default = ["10.20.1.0/24", "10.20.2.0/24"]
+
   # 유효성
   validation {
-    condition = length(var.public_subnet_cidrs) >= 1
+    condition     = length(var.public_subnet_cidrs) >= 1
     error_message = "최소 1개의 public subnet cidr 필수"
   }
 }

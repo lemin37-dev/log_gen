@@ -1,0 +1,8 @@
+# Terraform execution outputs
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+.terraform.lock.hcl
+

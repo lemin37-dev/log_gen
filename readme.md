@@ -19,6 +19,7 @@
 - locals.tf     : 공통값 가공, 태그, 전체 프로젝트 prefix 등 구성
 - vpc.tf        : 전용 네트워크(VPC, Subnet, IGW, Route Table, SG, AZ, ...) 구성
 - iam.tf        : Fargage가 ECR 이미지 획득, CloudWatch에 로그 기록 등의 권한 구성
+- sg.tf         : 보안그룹(외부 연결 X) -> ingress 미지정
 - logs.tf       : ECS 컨테이너 내 로그생성기가 발생시키는 로그의 로그 그룹을 지정
 - ecr.tf        : 파이썬으로 작성한 로그생성기를 docker 이미지로 만들어 저장하는 저장소
 - ecs.tf        : ECS 클러스터와 Fargate Task Definition등이 궁되는 실행환경을 구성 -> 1회성 (상시 운영 X)
