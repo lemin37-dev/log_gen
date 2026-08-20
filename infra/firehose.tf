@@ -22,8 +22,8 @@ resource "aws_kinesis_firehose_delivery_stream" "logs" {
 
     # 데이터 레코드 압축
     # 데이터를 모아둔 상태(버퍼)에서 기록할 때의 포맷 지정
-    compression_format = "UNCOMPRESSED" # 1차는 원본으로 지정
-    #compression_format = "GZIP"   # gzip 형태로 압축
+    #compression_format = "UNCOMPRESSED" # 1차는 원본으로 지정
+    compression_format = "GZIP"   # gzip 형태로 압축
 
     # S3 버킷 및 오류 출력 접두사 시간대
     custom_time_zone = "Asia/Seoul"

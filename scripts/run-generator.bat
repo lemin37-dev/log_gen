@@ -76,7 +76,7 @@ set "OVERRIDE_FILE=%TEMP%\loggen-overrides-%RUN_ID%.json"
 >>"%OVERRIDE_FILE%" echo         {"name":"BASE_RPS","value":"%BASE_RPS%"},
 >>"%OVERRIDE_FILE%" echo         {"name":"TIME_SCALE","value":"%TIME_SCALE%"},
 >>"%OVERRIDE_FILE%" echo         {"name":"CORRUPTION_RATE","value":"%CORRUPTION_RATE%"},
->>"%OVERRIDE_FILE%" echo         {"name":"INCLUDE_CORRUPTION_LABEL","value":"false"},
+>>"%OVERRIDE_FILE%" echo         {"name":"INCLUDE_CORRUPTION_LABEL","value":"true"},
 >>"%OVERRIDE_FILE%" echo         {"name":"OUTPUT_MODE","value":"stdout"},
 >>"%OVERRIDE_FILE%" echo         {"name":"RUN_ID","value":"%RUN_ID%"}
 >>"%OVERRIDE_FILE%" echo       ]
