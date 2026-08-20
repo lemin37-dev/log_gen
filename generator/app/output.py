@@ -11,18 +11,25 @@ import os
 from pathlib import Path
 # 파일 핸들의 타입을 명확하게 지정
 from typing import TextIO
+# @bronze : kinesis 출력을 위한 패키지 추가 (boto3 : amazon sdk 패키지)
+import boto3
 
 
 # JSONL 형식의 stdout/파일 출력을 담당하는 클래스
 class JsonlOutput:
     # 출력 방식과 로그 파일 경로를 초기화
-    def __init__(self, mode: str, log_file: str):
+    # @bronze : 클래스 생성자에 키네시스 관련 인자 추가 -> 객체 생성, 인스턴스 변수 초기화
+    def __init__(self, mode: str, log_file: str, kinesis_enabled:bool = False, kinesis_stream_name:str = ""):
         # stdout/file/both 중 선택한 출력 모드 저장
         self.mode = mode
         # 파일 출력 시 사용할 경로 저장
         self.log_file = log_file
         # 아직 열리지 않은 파일 핸들을 None으로 초기화
         self._handle: TextIO | None = None
+        # @bronze : 인스턴스 멤버변수 초기화
+        self.kinesis_enabled = kinesis_enabled
+        self.kinesis_stream_name = kinesis_stream_name
+        self._kinesis = None    # kinesis 서비스 객체
 
         # 파일 출력이 필요한 모드일 때만 파일을 준비
         if mode in {"file", "both"}:
@@ -32,6 +39,10 @@ class JsonlOutput:
             path.parent.mkdir(parents=True, exist_ok=True)
             # 기존 파일 뒤에 UTF-8 라인 버퍼링 방식으로 이어쓰기
             self._handle = path.open("a", encoding="utf-8", buffering=1)
+
+        # @bronze : kinesis 객체 생성 (kinesis 접근 가능)
+        if self.kinesis_enabled:
+            self._kinesis = boto3.client("kinesis")
 
     # 이벤트 한 건을 JSON 문자열로 변환해 지정된 출력 대상으로 전송
     def emit(self, event: dict, malformed_json: bool = False) -> None:
@@ -54,6 +65,13 @@ class JsonlOutput:
         if self._handle is not None:
             # 파일 출력 모드에서는 이벤트 한 건을 한 줄로 기록
             self._handle.write(line + os.linesep)
+        # @bronze : kinesis 전송
+        if self.kinesis_enabled and self._kinesis:
+            self._kinesis.put_record(
+                StreamName   = self.kinesis_stream_name,
+                Data         = (line + os.linesep).encode('utf-8'),
+                PartitionKey = str(event.get("domain", "default"))  # 도메인을 파티션 키로 활용해 같은 도메인끼리 확인하도록 구성
+            )
 
     # 열려 있는 로그 파일 핸들을 안전하게 닫음
     def close(self) -> None:
