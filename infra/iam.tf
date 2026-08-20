@@ -89,7 +89,7 @@ resource "aws_iam_role_policy" "firehose" {
 # ECS task -> data -> kinesis 권한 부여를 위한 Role 구성
 ## 기본적인 ECS task 정책 부여
 resource "aws_iam_role" "ecs_task_kinesis" {
-  name = "${var.project_name}-ecs-task"
+  name               = "${var.project_name}-ecs-task"
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json
 }
 
@@ -111,7 +111,7 @@ data "aws_iam_policy_document" "ecs_task_kinesis" {
 
 ## 조회한 role 연결
 resource "aws_iam_role_policy" "ecs_task_kinesis" {
-  name = "${var.project_name}-kinesis-write"
-  role = aws_iam_role.ecs_task_kinesis.id
+  name   = "${var.project_name}-kinesis-write"
+  role   = aws_iam_role.ecs_task_kinesis.id
   policy = data.aws_iam_policy_document.ecs_task_kinesis.json
 }
