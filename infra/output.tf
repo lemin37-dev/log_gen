@@ -39,3 +39,17 @@ output "ecr_repository_url" {
 output "cloudwatch_log_group" {
   value = aws_cloudwatch_log_group.generator.name
 }
+
+# @bronze : 새로 만든 kinesis, firehose, s3에 대한 정보 출력
+output "kinesis_stream_name" {
+  value = aws_kinesis_stream.logs.name
+}
+output "kinesis_stream_arn" {
+  value = aws_kinesis_stream.logs.arn
+}
+output "firehose_name" {
+  value = aws_kinesis_firehose_delivery_stream.logs.name
+}
+output "s3_bucket_name" {
+  value = aws_s3_bucket.data.bucket
+}

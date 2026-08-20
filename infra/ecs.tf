@@ -19,6 +19,10 @@ resource "aws_ecs_task_definition" "generator" {
   memory = tostring(var.task_memory)
   # 권한 (ECS Task 기본, push, 로그 저장 권한)
   execution_role_arn = aws_iam_role.ecs_execution.arn
+
+  # @bronze : 컨테이너 내부에서 파이썬으로 로그를 생성하고 kinesis로 전송하는 권한
+  task_role_arn = aws_iam_role.ecs_task_kinesis.arn
+
   # 서버리스 (컴퓨팅 자원의 운영체계)
   runtime_platform {
     operating_system_family = "LINUX"  # 컨테이너 실행환경
@@ -36,6 +40,10 @@ resource "aws_ecs_task_definition" "generator" {
 
       # 환경변수 -> 로그 생성기의 구동 설정값
       environment = [
+        # @bronze : kinesis 기능 활성화, kinesis stream 이름 환경변수 추가
+        { name = "KINESIS_ENABLED", value = "true" },
+        { name = "KINESIS_STREAM_NAME", value = aws_kinesis_stream.logs.name },
+
         { name = "DOMAIN", value = "ecommerce" },
         { name = "DURATION_SECONDS", value = "300" },
         { name = "MAX_EVENTS", value = "0" },
@@ -43,7 +51,7 @@ resource "aws_ecs_task_definition" "generator" {
         { name = "TIME_SCALE", value = "1.0" },
         { name = "CORRUPTION_RATE", value = "0.03" },
         { name = "INCLUDE_CORRUPTION_LABEL", value = "false" },
-        { name = "OUTPUT_MODE", value = "stdout" },
+        { name = "OUTPUT_MODE", value = "stdout" }, # stdout : ECS log driver -> cloud watch
         { name = "LOG_FILE", value = "/tmp/generated-logs.jsonl" },
         { name = "TIMEZONE", value = "Asia/Seoul" },
         { name = "FAKER_LOCALE", value = "ko_KR" },

@@ -14,3 +14,6 @@ provider "aws" {
 data "aws_availability_zones" "available" {
   state = "available"
 }
+
+# @bronze : AWS Account ID 조회
+data "aws_caller_identity" "current" {}

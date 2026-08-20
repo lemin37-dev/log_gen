@@ -74,6 +74,24 @@ Fargate → Kinesis → Firehose → S3 확인 (jsonl, gzip)
 ```
 
 # 인프라 수정 및 추가
+```
+├─infra
+│  │  ecr.tf              # 유지
+│  │  ecs.tf              
+│  │  iam.tf              # firehose, ecs-task ~ kinesis 관련 내용 추가
+│  │  locals.tf
+│  │  logs.tf             # 유지
+│  │  output.tf
+│  │  provider.tf
+│  │  sg.tf               # 유지
+│  │  variables.tf
+│  │  version.tf          # 유지
+│  │  vpc.tf              # 유지
+│  │  
+│  │  kinesis.tf          # 신규
+│  │  firehose.tf         # 신규
+│  │  s3.tf               # 신규
+```
 
 # 프로그램 수정
 
