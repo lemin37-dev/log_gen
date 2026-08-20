@@ -102,5 +102,6 @@ Fargate → Kinesis → Firehose → S3 확인 (jsonl, gzip)
   ```
 - config.py : ECS에서 추가한 환경변수 전달
 - output.py : 출력방향에 kinesis 추가
+- main.py : 생성 매개변수 조정
 
 # bat|sh 수정
