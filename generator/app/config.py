@@ -76,15 +76,16 @@ class Settings:
         # 실행 시간이 음수인지 검증
         if duration_seconds < 0:
             raise ValueError("DURATION_SECONDS must be >= 0")
-        # 시간과 개수 제한이 모두 없어서 무한 실행되는 설정을 차단
-        if duration_seconds == 0 and max_events == 0:
-            raise ValueError("Set DURATION_SECONDS > 0 or MAX_EVENTS > 0 to bound the run")
-
+        
         # 3. 최대 이벤트 수를 읽으며 0은 개수 제한을 사용하지 않음
         max_events = _env_int("MAX_EVENTS", 0)
         # 최대 이벤트 수가 음수인지 검증
         if max_events < 0:
             raise ValueError("MAX_EVENTS must be >= 0")
+
+        # 시간과 개수 제한이 모두 없어서 무한 실행되는 설정을 차단
+        if duration_seconds == 0 and max_events == 0:
+            raise ValueError("Set DURATION_SECONDS > 0 or MAX_EVENTS > 0 to bound the run")
 
         # 4. 기본 초당 이벤트 생성량(RPS)을 읽음
         base_rps = _env_float("BASE_RPS", 2.0)
