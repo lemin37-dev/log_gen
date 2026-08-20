@@ -31,12 +31,12 @@ resource "aws_kinesis_firehose_delivery_stream" "logs" {
     # S3 버킷 Prefix (최대 1024자)
     # Partition Pruning -> Athena/Opensearch/Glue/Spark 등 열 기반으로 데이터 추출 시 유용 -> 검색속도 향상
     # 예시) bronze/year=2026/month=08/day=20/hour=11/...
-    prefix = "bronze/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}"
+    prefix = "bronze/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
 
     # S3 버킷 오류 출력 Prefix
     # 메달리온 계층별 하위에 error를 구성해도 되고 아래처럼 error를 따로 모아 구성가능
     # 경로상에 에러에 대한 타입 지정 -> 유형별로 에러가 모이게 작성
-    error_output_prefix = "error/!{firehose:error-output-type}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}"
+    error_output_prefix = "error/!{firehose:error-output-type}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
   }
 
   # 의존성

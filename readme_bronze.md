@@ -105,3 +105,33 @@ Fargate → Kinesis → Firehose → S3 확인 (jsonl, gzip)
 - main.py : 생성 매개변수 조정
 
 # bat|sh 수정
+- 코드 수정 -> 이미지 수정 필요 -> ECR 업데이트 (setup.bat|sh)
+```
+scripts\setup.bat
+```
+
+# 브론즈 데이터 생성
+- 실행 옵션
+```
+ecommerce       도메인
+5               5초 실행
+5               기본 5 RPS
+0.05            오염 데이터 5%
+1               Fargate Task 1개
+ap-northeast-2  서울 리전
+1               Time Scale 1배
+```
+
+- 명령
+- 25건 생성
+- CloudWatch 로그 기록(default : stdout)
+- kinesis -> firehose -> s3 기록
+- 로그 발생 후 S3에서 언제 확인가능한지? -> 설정상 약간의 텀이 존재함(firehose의 buffer 설정 확인)
+- 실행
+```
+scripts\run-generator.bat ecommerce 5 5 0.05 1 ap-northeast-2 1
+```
+- 로그 확인
+```
+aws logs tail "/ecs/de-ai-19-loggen" --follow --region "ap-northeast-2"
+```
