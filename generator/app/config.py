@@ -54,6 +54,10 @@ class Settings:
     include_corruption_label: bool
     output_mode: str
     log_file: str
+    # @bronze : 환경변수 받아와 kinesis 전송처리
+    kinesis_enabled:bool
+    kinesis_stream_name:str
+
     timezone: str
     faker_locale: str
     environment: str
@@ -116,6 +120,13 @@ class Settings:
         # seed가 있으면 정수로 변환하고 없으면 None 사용
         seed = int(seed_raw) if seed_raw else None
 
+        # @bronze : kinesis 관련 처리
+        # kinesis 사용여부와 stream 명 확인
+        kinesis_enabled = _env_bool("KINESIS_ENABLED", False)
+        kinesis_stream_name = _env("KINESIS_STREAM_NAME", "")
+        if kinesis_enabled and not kinesis_stream_name:
+            raise ValueError("KINESIS_STREAM_NAME is required.")
+
         # 검증이 끝난 환경변수 값으로 Settings 객체 생성 -> 클레스에 인자 넣어서 객체 생성
         return cls(
             domain                          =domain,
@@ -128,6 +139,11 @@ class Settings:
             output_mode                     =output_mode,
             # 선택 여지 없이 기본값
             log_file                        =_env("LOG_FILE", "/tmp/generated-logs.jsonl"),
+
+            # @bronze : 초기화
+            kinesis_enabled                 = kinesis_enabled,
+            kinesis_stream_name             = kinesis_stream_name,
+
             timezone                        =_env("TIMEZONE", "Asia/Seoul"),
             faker_locale                    =_env("FAKER_LOCALE", "ko_KR"),
             environment                     =_env("ENVIRONMENT", "simulation"),

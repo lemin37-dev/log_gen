@@ -93,6 +93,12 @@ Fargate → Kinesis → Firehose → S3 확인 (jsonl, gzip)
 │  │  s3.tf               # 신규
 ```
 
-# 프로그램 수정
+# 프로그램(파이썬) 수정
+- 로그를 kinesis로 전송하도록 조정
+- 패키지 추가 (requirements.txt)
+  ```
+  Faker
+  boto3   # AWS SDK 패키지
+  ```
 
 # bat|sh 수정
