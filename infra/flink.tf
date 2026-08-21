@@ -12,10 +12,10 @@ resource "aws_s3_object" "flink_app" {
   # 버킷 지정
   bucket = aws_s3_bucket.data.id
   # flink 앱 지정 -> 키
-  key    = "flink/applications/flink-silver-${local.flink_artifact_hash}.zip"
+  key = "flink/applications/flink-silver-${local.flink_artifact_hash}.zip"
 
   # local -> s3 업로드한 zip(flink app) 경로
-  source      = local.flink_artifact_path
+  source = local.flink_artifact_path
   # flink app hash 값 -> 소스 변경 시 감지됨
   source_hash = local.flink_artifact_hash
 
@@ -26,14 +26,14 @@ resource "aws_s3_object" "flink_app" {
 
 # flink 자체 내용
 resource "aws_kinesisanalyticsv2_application" "silver" {
-  name                   = local.flink_application_name
-  description            = "Raw(Bronze) Kinesis events to Silver Kinesis using PyFlink"
+  name        = local.flink_application_name
+  description = "Raw(Bronze) Kinesis events to Silver Kinesis using PyFlink"
   # runtime env (version)
-  runtime_environment    = var.flink_runtime_environment
+  runtime_environment = var.flink_runtime_environment
   # role
   service_execution_role = aws_iam_role.flink.arn
   # application - true : 생성 후 즉시 실행 / false : 생성만 진행(따로 실행필요)
-  start_application      = var.flink_start_application
+  start_application = var.flink_start_application
 
   # application 상세 구성
   application_configuration {
@@ -58,7 +58,7 @@ resource "aws_kinesisanalyticsv2_application" "silver" {
     environment_properties {
       # Raw(bronze) layer kinesis 입력부 리소스 
       property_group {
-        property_group_id = "InputStream0"    # flink 앱의 application_properties.json에 지정한 PropertyGroupId과 일치시켜야 함
+        property_group_id = "InputStream0" # flink 앱의 application_properties.json에 지정한 PropertyGroupId과 일치시켜야 함
 
         property_map = {
           "stream.arn"                 = aws_kinesis_stream.logs.arn
@@ -69,7 +69,7 @@ resource "aws_kinesisanalyticsv2_application" "silver" {
 
       # 가공/전처리(Silver) layer kinesis 출력부 리소스
       property_group {
-        property_group_id = "OutputStream0"   # flink 앱의 application_properties.json에 지정한 PropertyGroupId과 일치시켜야 함
+        property_group_id = "OutputStream0" # flink 앱의 application_properties.json에 지정한 PropertyGroupId과 일치시켜야 함
 
         property_map = {
           "stream.arn" = aws_kinesis_stream.silver.arn
@@ -84,7 +84,7 @@ resource "aws_kinesisanalyticsv2_application" "silver" {
 
         property_map = {
           # Flink application entry point
-          "python"  = "main.py"
+          "python" = "main.py"
           # pyFlink -> kinesis 접근에 필요한 라이브러리(드라이버)
           "jarfile" = "lib/pyflink-dependencies.jar"
           # pytnon UDF Worker가 transform.py를 import하도록 등록
@@ -97,13 +97,13 @@ resource "aws_kinesisanalyticsv2_application" "silver" {
     flink_application_configuration {
       # 장애 복구 시 checkpoint 설정
       checkpoint_configuration {
-        configuration_type = "DEFAULT"  # 기본값
+        configuration_type = "DEFAULT" # 기본값
       }
       # flink 로그, 메트릭 수집 수준 설정
       monitoring_configuration {
-        configuration_type = "CUSTOM"       # 직접 설정
-        log_level          = "INFO"         # 정보 수준
-        metrics_level      = "APPLICATION"  # 애플리케이션 단위(레벨) 정보 (system log/metric X)
+        configuration_type = "CUSTOM"      # 직접 설정
+        log_level          = "INFO"        # 정보 수준
+        metrics_level      = "APPLICATION" # 애플리케이션 단위(레벨) 정보 (system log/metric X)
       }
       # application 구동 시 병렬처리, KPU 설정 
       parallelism_configuration {
