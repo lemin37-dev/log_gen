@@ -5,6 +5,10 @@
   - Streaming Ingestion -> Streaming Processing + Medalion Architecture
   - Step 1
     - Log generator -> Kinesis -> Flink(java, python, pom.xml) -> Kinesis -> Firehose -> S3 bronze (raw data, Gzip)
+    - Flink, Kinesis, Firehose 3개 리소스 생성
+    - S3 silver는 기존 버킷 하위에 구성
+      - 초기 구성에는 jsonl 저장
+      - 이후에는 parquet 저장 -> Glue 스키마 구성하여 연동
   - Step 2
     - Log generator -> Kinesis -> lambda -> Kinesis -> Firehose -> S3 bronze (raw data, Gzip)
 
@@ -25,3 +29,99 @@
   - Exactly-once 처리 지원: 중복이나 누락을 최소화하는 신뢰성 높은 스트림 처리 가능
   - `대용량 처리에 적합`: 지속적인 고속 이벤트 처리에 Lambda보다 유리
   - 복잡한 처리 가능: 필터링, 변환, 집계, 조인, 이상 탐지 등에 적합
+
+# 데이터 저장소
+```
+S3 Bucket
+├── bronze/
+│   └── year=.../month=.../day=.../hour=...
+├── silver/
+│   └── year=.../month=.../day=.../hour=...
+├── flink/
+│   └── applications/
+│       └── flink-silver-xxxxx.zip  # filnk 처리를 수행하는 앱(*.py, pom.xml, *.jar)
+└── errors/
+    ├── bronze/
+    │   └── ...
+    └── silver/
+        └── ...
+```
+
+# 구조
+- 브론즈 유지 및 일부 수정
+- 실버 레이어 추가 - kinesis(브론즈) 공급자, flink 소비자 관점
+```
+로그 생성기
+    ↓
+Kinesis Raw (2가지 방향성으로 전송)
+    ├────────────→ Firehose → S3 Bronze
+    │
+    └→ Flink
+         ↓
+     검증 / 정제 / 변환
+         ↓
+   Kinesis Silver
+         ↓
+      Firehose
+         ↓
+      S3 Silver
+```
+
+# 인프라 수정
+## 종합
+
+| 구분         | 파일              | 변경 내용                                            |
+| ---------- | --------------- | ------------------------------------------------ |
+| **수정**     | `locals.tf`     | Silver Kinesis/Flink/Firehose 이름 추가              |
+| **수정**     | `variables.tf`  | Flink Runtime, Parallelism, Silver Shard 등 변수 추가 |
+| **수정**     | `firehose.tf`   | Bronze 오류 경로를 `errors/bronze/`로 정리               |
+| **수정**     | `outputs.tf`    | Silver/Flink 관련 Output 추가                        |
+| ---------- | --------------- | ------------------------------------------------ |
+| **신규**     | `iam-flink.tf`  | Flink + Silver Firehose IAM                      |
+| **신규**     | `silver.tf`     | Silver Kinesis + Silver Firehose 생성              |
+| **신규**     | `flink.tf`      | Managed Flink + `flink/`에 코드 업로드                 |
+| **신규**     | `flink-logs.tf` | Flink CloudWatch 로그                              |
+
+
+# flink 앱 구성
+- 구성
+```
+flink/
+├── app/
+│   ├── main.py                     : flink 앱 엔트리포인트
+│   │                                 브론즈 kinesis 읽기 -> transform 모듈을 불러와 clean -> 실버 kinesis에 가공된 데이터 전송 
+│   └── transform.py                : 정제, 전처리 등 데이터 처리작업 진행
+│
+├── target/                         : maven build output 경로 (빌드 진행 시 생성)
+│   └── *.zip                       : 빌드 결과로 생성된 flink 앱 (빌드 진행 시 생성)
+├── assembly/
+│   └── assembly.xml                : flink 앱(zip) 구성에 대한 정의
+│
+├── application_properties.json     : local 실행 시 input/output kinesis 설정
+├── pom.xml                         : 의존성 파일 다운로드, jar 생성, zip 패키징 실행
+├── README.md
+└── .gitignore
+```
+
+- 빌드전 설치 (java, maven)
+```
+# 윈도우
+winget search Microsoft.OpenJDK 
+winget install Microsoft.OpenJDK.11
+java -version
+choco install maven or scoop install main/maven or 직접설치
+https://maven.apache.org/download.cgi?utm_source=chatgpt.com 접속 > apache-maven-3.9.16-bin.zip 다운
+bin 폴더를 path 설정
+
+# 맥
+brew install openjdk@11 maven
+export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+mvn -version
+```
+
+- 빌드
+```
+./scripts/build-flink.bat|sh
+```

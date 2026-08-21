@@ -86,3 +86,62 @@ variable "firehose_buffer_interval" {
   type        = number
   default     = 60
 }
+
+# @silver : 새로운 리소스에 대한 변수 추가
+# silver layer에서 사용할 kinesis의 출력용 샤드 수
+variable "silver_kinesis_shard_count" {
+  description = "Silver KDS's shard count"
+  type        = number
+  default     = 1
+}
+# kinesis 보관 기간
+variable "silver_kinesis_retention_hour" {
+  description = "Silver KDS's retention period in hours"
+  type        = number
+  default     = 24
+}
+# PyFlink 버전(런타임 환경 버전)
+variable "flink_runtime_environment" {
+  description = "Managed Apache Flink의 런타임 환경"
+  type        = string
+  default     = "FLINK-1_20"
+}
+# Flink Application 병렬 구성 수
+variable "flink_parallelism" {
+  description = "Initial Flink application parallelism"
+  type        = number
+  default     = 1
+}
+# KPU(Kinesis Processing Unit) 하나당 Parallel task 수 설정
+# 기본 컴퓨팅의 과금단위
+variable "flink_parallelism_per_kpu" {
+  description = "Flink parallel tasks per KPU"
+  type        = number
+  default     = 1
+}
+# true일 경우 인프라가 적용된 후 바로 실행
+# false일 경우 실제 사용 시 적용
+# flink는 실행중으로 설정해두어야만 작동됨
+variable "flink_start_application" {
+  description = "Whether Terraform should start the Managed Flink application"
+  type        = bool
+  default     = true
+}
+# Flink를 가동하고 나서 입력(브론즈)방향 kinesis에서 데이터를 읽을 때 어디서부터 처리할 것인지에 대한 설정
+# 데이터는 계속해서 전송중 -> 추후 Flink 가동 -> 가동 전에 도달한 데이터도 처리할 것인지 or 가동 이후 도착 데이터에 대해서만 처리할 것인지
+# LATEST : flink 가동 후 들어오는 데이터만 처리
+# TRIM_HORIZON : kinesis에 남아있는 과거 로그데이터 모두 처리 -> 재처리/테스트/전체(이전) 데이터 처리
+variable "flink_source_init_position" {
+  description = "flink가 데이터 처리 시 입력원의 어디서부터 처리할 것인지 설정"
+  type        = string
+  default     = "LATEST"
+
+  validation {
+    # 2가지 option만 허용
+    condition = contains([
+      "LATEST",
+      "TRIM_HORIZON"
+    ], var.flink_source_init_position)
+    error_message = "flink_source_init_position is only LATEST or TRIM_HORIZON"
+  }
+}

@@ -16,3 +16,12 @@ locals {
   kinesis_stream_name = "${var.project_name}-kinesis"
   firehose_name       = "${var.project_name}-firehose"
 }
+
+# @silver : 추가된 리소스명 정의를 위한 local 변수 추가
+locals {
+  silver_kinesis_stream_name = "${var.project_name}-silver-kinesis"
+  silver_firehose_name       = "${var.project_name}-silver-firehose"
+  flink_application_name     = "${var.project_name}-silver-flink"
+  flink_log_group_name       = "/aws/kinesis-analysis/${var.project_name}-silver-flink"
+  flink_log_stream_name      = "${var.project_name}-kinesis-analysis-log-stream"
+}
