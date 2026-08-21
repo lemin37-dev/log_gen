@@ -61,4 +61,8 @@ resource "aws_kinesis_firehose_delivery_stream" "silver" {
     aws_iam_role_policy.firehose_silver
   ]
 
+  tags = {
+    DataLayer = "silver"
+    Processor = "flink"
+  }
 }
